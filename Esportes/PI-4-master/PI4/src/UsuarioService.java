@@ -1,36 +1,81 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class IdentificadorUsuario {
-    private List<Usuario> usuarios;
+public class UsuarioService {
+    private List<Usuario> usuarios = new ArrayList<>();
+    private int proximoId = 1;
 
-    public IdentificadorUsuario() {
-        this.usuarios = new ArrayList<>();
-    }
+    public Usuario cadastrarUsuario(String nome, String email, String senha, String cpf, String telefone, String cep, String endereco) {
+        if (nome.isEmpty() || email.isEmpty() || senha.isEmpty() || cpf.isEmpty() || telefone.isEmpty() || cep.isEmpty() || endereco.isEmpty()) {
+            throw new IllegalArgumentException("Todos os campos devem ser preenchidos!");
+        }
+        if (!email.contains("@") || !email.contains(".")) {
+            throw new IllegalArgumentException("Email inválido!");
+        }
+        if (cpfJaExiste(cpf)) {
+            throw new IllegalArgumentException("CPF já cadastrado!");
+        }
 
-    public void adicionarUsuario(Usuario usuario) {
+        Usuario usuario = new Usuario(proximoId++, nome, email, senha, cpf, telefone, cep, endereco);
         usuarios.add(usuario);
+        return usuario;
     }
 
-    public Usuario identificarPorId(int id) {
-        for (Usuario usuario : usuarios) {
-            if (usuario.getId() == id) {
-                return usuario;
-            }
-        }
-        return null;
-    }
-
-    public Usuario identificarPorEmail(String email) {
-        for (Usuario usuario : usuarios) {
-            if (usuario.getEmail().equalsIgnoreCase(email)) {
-                return usuario;
-            }
-        }
-        return null;
-    }
-
-    public List<Usuario> getUsuarios() {
+    public List<Usuario> listarUsuarios() {
         return usuarios;
+    }
+
+    public Usuario alterarUsuario(int id, String novoNome, String novoEmail, String novoTelefone, String novoCep, String novoEndereco) {
+        for (Usuario u : usuarios) {
+            if (u.getId() == id) {
+                u.setNome(novoNome);
+                u.setEmail(novoEmail);
+                u.setTelefone(novoTelefone);
+                u.setCep(novoCep);
+                u.setEndereco(novoEndereco);
+                return u;
+            }
+        }
+        return null;
+    }
+
+
+    public boolean ativarUsuario(int id) {
+        for (Usuario u : usuarios) {
+            if (u.getId() == id) {
+                u.ativar();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean desativarUsuario(int id) {
+        for (Usuario u : usuarios) {
+            if (u.getId() == id) {
+                u.desativar();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean alterarSenha(int id, String novaSenha) {
+        for (Usuario u : usuarios) {
+            if (u.getId() == id) {
+                u.alterarSenha(novaSenha);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean cpfJaExiste(String cpf) {
+        for (Usuario u : usuarios) {
+            if (u.getCpf().equals(cpf)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
